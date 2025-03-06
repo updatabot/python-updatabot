@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "updatabot"
-version = "0.0.1"
+version = "0.0.8"
 authors = [
   { name="Example Author", email="author@example.com" },
 ]
@@ -12,9 +12,9 @@ description = "Datascript library for https://updatabot.com"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "pandas",
-    "requests",
-    "python-dotenv"
+    # "pandas==2.2.3",
+    # "requests==2.32.2",
+    # "python-dotenv==1.0.1",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
