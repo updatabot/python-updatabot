@@ -11,4 +11,4 @@ rm -rf dist
 python3 -m build
 
 # Upload the package to PyPI
-python3 -m twine upload --repository testpypi dist/* --verbose
+python3 -m twine upload dist/* --verbose
