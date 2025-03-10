@@ -1,4 +1,5 @@
 from .schema.SchemaDataset import KeyFamily
+import json
 
 
 class NomisDatasetAnnotations:
@@ -50,8 +51,10 @@ class NomisDatasetDimensions:
         self.measures = None
         self.geo = None
         self.age = None
+        self.c_age = None
         self.sex = None
-        self.misc = []
+        self.c_sex = None
+        self.misc = {}
 
         # Always present.
         # eg. "CL_1_1_TIME" or "CL_37_1_TIME"
@@ -78,35 +81,47 @@ class NomisDatasetDimensions:
                     raise ValueError(f"Duplicate geography dimensions")
                 self.geo = d.codelist
 
-            elif d.conceptref == 'AGE' or d.conceptref == 'C_AGE':
-                # 298 datasets have C_AGE
+            elif d.conceptref == 'AGE':
                 # 43 datasets have AGE
                 if self.age is not None:
                     raise ValueError(f"Duplicate age dimensions")
                 self.age = d.codelist
+            elif d.conceptref == 'C_AGE':
+                # 298 datasets have C_AGE
+                if self.c_age is not None:
+                    raise ValueError(f"Duplicate C_AGE dimensions")
+                self.c_age = d.codelist
 
-            elif d.conceptref == 'C_SEX' or d.conceptref == 'SEX':
-                # 335 datasets have C_SEX
+            elif d.conceptref == 'SEX':
                 # 64 datasets have SEX
                 if self.sex is not None:
                     raise ValueError(f"Duplicate sex dimensions")
                 self.sex = d.codelist
 
+            elif d.conceptref == 'C_SEX':
+                # 335 datasets have C_SEX
+                if self.c_sex is not None:
+                    raise ValueError(f"Duplicate C_SEX dimensions")
+                self.c_sex = d.codelist
+
             else:
-                # conceptref has very little information to offer beyond this point.
-                # Values are like "C_TENHUK11", which isn't descriptive.
-                if d.codelist in self.misc:
-                    raise ValueError(f"Duplicate dimension {d.codelist}")
-                self.misc.append(d.codelist)
+                # conceptref is the URL key for the download.
+                # codelist is used to look up valid values
+                if d.conceptref in self.misc:
+                    raise ValueError(f"Duplicate dimension {d.conceptref}")
+                self.misc[d.conceptref] = d.codelist
 
     def __str__(self):
         return f"""  [dimensions]
+    Time: {self.time}
     Freq: {self.freq}
     Measures: {self.measures}
     Geo: {self.geo}
     Age: {self.age}
+    C_Age: {self.c_age}
     Sex: {self.sex}
-    Misc: {', '.join(self.misc)}"""
+    C_Sex: {self.c_sex}
+    Misc: {json.dumps(self.misc)}"""
 
 
 class NomisDataset:
