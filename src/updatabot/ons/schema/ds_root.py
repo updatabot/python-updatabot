@@ -9,13 +9,19 @@ class Contact(BaseModel):
 
 
 class Link(BaseModel):
+    href: Optional[HttpUrl] = None
+
+
+class Publication(BaseModel):
     href: HttpUrl
+    title: str
 
 
 class Links(BaseModel):
     editions: Link
     latest_version: Link
     self: Link
+    taxonomy: Optional[Link] = None
     id: Optional[str] = Field(None, alias="latest_version.id")
 
 
@@ -31,23 +37,29 @@ class IsBasedOn(BaseModel):
 
 
 class DatasetRoot(BaseModel):
-    canonical_topic: str
     contacts: List[Contact]
     description: str
     id: str
-    is_based_on: IsBasedOn
     keywords: List[str]
     links: Links
-    national_statistic: bool
-    qmi: dict
-    related_content: List[RelatedContent]
-    state: Literal["published"]  # Could be expanded if other states exist
-    subtopics: List[str]
-    survey: str
-    themes: List[str]
     title: str
-    type: str
-    unit_of_measure: str
+    state: Literal["published"]
+
+    # Not all fields always appear
+    national_statistic: Optional[bool] = False
+    license: Optional[str] = None
+    next_release: Optional[str] = None
+    release_frequency: Optional[str] = None
+    publications: Optional[List[Publication]] = None
+    related_datasets: Optional[List[Publication]] = None
+    qmi: Optional[Link] = None
+    unit_of_measure: Optional[str] = None
+    canonical_topic: Optional[str] = None
+    is_based_on: Optional[IsBasedOn] = None
+    subtopics: Optional[List[str]] = None
+    themes: Optional[List[str]] = None
+    survey: Optional[str] = None
+    type: Optional[str] = None
 
 ## # fmt: off
 ## ---------------------------------------------

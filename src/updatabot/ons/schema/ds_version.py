@@ -4,15 +4,15 @@ from .ds_root import IsBasedOn
 
 
 class Dimension(BaseModel):
-    description: str
+    description: Optional[str] = None
     href: HttpUrl
     id: str
-    is_area_type: bool
+    is_area_type: Optional[bool] = None
     label: str
     links: Dict
     name: str
-    number_of_options: int
-    variable: str
+    number_of_options: Optional[int] = None
+    variable: Optional[str] = None
     quality_statement_url: Optional[HttpUrl] = None
 
 
@@ -25,13 +25,13 @@ class Download(BaseModel):
 class Downloads(BaseModel):
     csv: Download
     csvw: Download
-    txt: Download
-    xls: Download
+    txt: Optional[Download] = None
+    xls: Optional[Download] = None
 
 
 class VersionLinks(BaseModel):
     dataset: Dict[str, str]
-    dimensions: Dict
+    dimensions: Optional[Dict] = None
     edition: Dict[str, str]
     self: Dict[str, HttpUrl]
 
@@ -43,13 +43,13 @@ class DatasetVersion(BaseModel):
     downloads: Downloads
     edition: str
     id: str
-    is_based_on: IsBasedOn  # Reusing from ds_root
-    latest_changes: List
+    is_based_on: Optional[IsBasedOn] = None
+    latest_changes: Optional[List] = None
     links: VersionLinks
-    lowest_geography: str
+    lowest_geography: Optional[str] = None
     release_date: str
     state: Literal["published"]
-    type: str
+    type: Optional[str] = None
     usage_notes: List
     version: int
 
