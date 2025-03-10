@@ -1,7 +1,5 @@
 from typing import Literal
-from pydantic import ValidationError
-from .api_common import get_json, NomisStructure, StrictObject
-from ...logger import logger
+from .SchemaCommon import NomisStructure, StrictObject
 import json
 
 # ---
@@ -49,7 +47,8 @@ import json
 ##     "schemalocation": "http://sdmx.org/docs/2_0/SDMXMessage.xsd"
 ##   }
 ## }
-## 
+## fmt: on
+
 
 class Name(StrictObject):
     value: str
@@ -65,43 +64,14 @@ class Concept(StrictObject):
     uri: Literal[""]
     version: Literal[""]
 
+
 class Concepts(StrictObject):
     concept: Concept
+
 
 class Structure(NomisStructure):
     concepts: Concepts | None = None
 
-class ConceptResponse(StrictObject):
+
+class SchemaConcept(StrictObject):
     structure: Structure
-
-
-def get_concept(conceptref: str) -> str:
-    """
-    **DEPRECATED**: use conceptref.replace('_', ' ').title()
-
-    Get the name of a concept from the API.
-
-    Deprecated because NOMIS do not store anything interesting against conceptref.
-    There are hundreds of API calls to make, all mapping a conceptref to an obviously derived name:
-
-    "UNIT_MULTIPLIER": "Unit Multiplier",
-    "SOC2020_FULL": "Soc2020 full",
-    "OCCPUK113_HRPPUK11": "Occpuk113 hrppuk11",
-    "ICDGP_CONDITION": "Icdgp condition",
-
-    The only exception found (2025-03-10) is "FREQ": "Frequency" which is not exciting enough to be worthwhile.
-    Title-casing the ID gives the same result as sending a GET request.
-    """
-    logger.warning(f"get_concept({conceptref}) is deprecated. Use conceptref.replace('_', ' ').title()")
-    # --
-    obj = get_json(f'/concept/{conceptref}.def.sdmx.json')
-    try:
-        parsed = ConceptResponse(**obj)
-    except ValidationError as e:
-        logger.error(json.dumps(obj, indent=2))
-        raise ValueError(f"Invalid concept response: {e}") from e
-    if parsed.structure.concepts is None:
-        logger.warning(f"No concepts found for {conceptref}")
-        return conceptref
-    return parsed.structure.concepts.concept.name.value
-
