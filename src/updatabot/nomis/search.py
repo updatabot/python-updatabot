@@ -1,8 +1,10 @@
-from .schema.SchemaDataset import KeyFamily
+from .schema.ResponseDataset import KeyFamily
+from . import api
 import json
+from typing import List
 
 
-class NomisDatasetAnnotations:
+class NomisSearchHitAnnotations:
     """
     Use our judgement to extract the most useful annotations.
     """
@@ -39,7 +41,7 @@ class NomisDatasetAnnotations:
     CensusRelease: {self.census_release}"""
 
 
-class NomisDatasetDimensions:
+class NomisSearchHitDimensions:
     """
     Extract a tightly structured set of dimensions.
     There are hundreds of single-use dimensions, but we capture those
@@ -124,7 +126,13 @@ class NomisDatasetDimensions:
     Misc: {json.dumps(self.misc)}"""
 
 
-class NomisDataset:
+class NomisSearchHit:
+    """
+    Represents a cleaned-up version of the JSON API response.
+    A search hit has an ID, name, description, and some annotations.
+    It lists the IDs of dimensions, which are a foreign key into Codelists.
+    """
+
     def __init__(self, keyfamily: KeyFamily):
         # Important!
         self.id = keyfamily.id
@@ -135,8 +143,8 @@ class NomisDataset:
         # eg. "Records the number of people claiming Jobseeker's..."
         self.description = keyfamily.description.value if keyfamily.description else None
 
-        self.annotations = NomisDatasetAnnotations(keyfamily)
-        self.dimensions = NomisDatasetDimensions(keyfamily)
+        self.annotations = NomisSearchHitAnnotations(keyfamily)
+        self.dimensions = NomisSearchHitDimensions(keyfamily)
 
     def __str__(self):
         return f"""[dataset] {self.id}
@@ -144,3 +152,12 @@ Name: {self.name}
 Description: {self.description}
 {self.dimensions}
 {self.annotations}"""
+
+
+def search(query: str = None) -> List[NomisSearchHit]:
+    """
+    Search for datasets by name or description.
+    """
+    resp = api.fetch_search(query)
+    keyfamilies = resp.structure.keyfamilies.keyfamily
+    return [NomisSearchHit(k) for k in keyfamilies]
