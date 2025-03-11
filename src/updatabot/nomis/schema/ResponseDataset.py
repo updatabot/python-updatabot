@@ -234,7 +234,7 @@ class KeyFamilies(StrictObject):
 
 
 class Structure(NomisStructure):
-    keyfamilies: KeyFamilies
+    keyfamilies: Optional[KeyFamilies] = None
 
 
 class ResponseDataset(StrictObject):

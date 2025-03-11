@@ -2,11 +2,9 @@ from typing import List, Optional, Literal, Union
 from .NomisStructure import StrictObject, Contact
 
 # ---
-# NOMIS API: Full dataset list
-#  /api/v01/dataset/def.sdmx.json
-#
-# This API supports ?search params, but we can do that locally.
-# Requesting them all (~1600 objects) gives better cache performance.
+# NOMIS API: Dataset overview document
+#   Combines the metadata of a search hit with the JOINs on dimensions' codelists.
+#   /api/v01/dataset/{id}.overview.json
 # ---
 
 ## fmt: off
