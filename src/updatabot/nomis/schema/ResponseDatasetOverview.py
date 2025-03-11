@@ -338,7 +338,7 @@ class DimensionGeographyTypes(StrictObject):
     # --
     # types = null            # 6737 dimensions
     # types = [{...}, ...]    # 1604 dimensions
-    # types = {...}           # 1604 dimensions
+    # types = {...}           # 16 dimensions
     type: Union[DimensionGeographyType, List[DimensionGeographyType]]
 
 
@@ -473,8 +473,8 @@ class Units(StrictObject):
 
 
 class Analysis(StrictObject):
-    code: int
     id: str
+    code: int
     name: str
 
 
