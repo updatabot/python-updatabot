@@ -218,10 +218,37 @@ class NomisSearchHit:
         return "\n".join(html)
 
 
-def search(query: str = None) -> List[NomisSearchHit]:
+class NomisSearchResults(list):
+    """A list-like container for NomisSearchHit results that provides a combined HTML representation"""
+
+    def __str__(self):
+        return "\n".join(f"-- NomisSearchHit {i+1}/{len(self)} --\n{hit}" for i, hit in enumerate(self))
+
+    def _repr_html_(self):
+        if not self:
+            return "<p><em>No results found</em></p>"
+        return "<hr>".join(f"<p>NomisSearchHit {i+1}/{len(self)}</p>{hit._repr_html_()}" for i, hit in enumerate(self))
+
+
+def search(query: str = None, is_current: bool = None) -> NomisSearchResults:
     """
     Search for datasets by name or description.
+    Returns results in a container that properly displays all hits in IPython/Jupyter.
+
+    Args:
+        query: A string to search for.
+        is_current: Pass True to only return current datasets, or False to return historical datasets.
     """
+    if query:
+        # Force this to be a wildcard query for a friendly experience
+        if not query.startswith('*'):
+            query = '*' + query
+        if not query.endswith('*'):
+            query = query + '*'
     resp = api.fetch_search(query)
     keyfamilies = resp.structure.keyfamilies.keyfamily if resp.structure.keyfamilies else []
-    return [NomisSearchHit(k) for k in keyfamilies]
+    out = NomisSearchResults(NomisSearchHit(k) for k in keyfamilies)
+    if is_current is not None:
+        out = NomisSearchResults(
+            hit for hit in out if hit.is_current == is_current)
+    return out
