@@ -1,9 +1,8 @@
 from . import fetch
 from .schema import SchemaDataset
-from .NomisDataset import NomisDataset
 
 
-def get_geography(dataset_id, parent=None):
+def fetch_geography(dataset_id, parent=None):
     """Get the geography codelist for a dataset."""
     # obj = fetch(f'/dataset/{id}/def.sdmx.json')
     # parsed = SchemaDataset(**obj)

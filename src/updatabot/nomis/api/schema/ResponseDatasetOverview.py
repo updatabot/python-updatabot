@@ -1,6 +1,5 @@
-from pydantic import Field
-from typing import List, Optional, Literal, Annotated, Union
-from .SchemaCommon import NomisStructure, StrictObject, Contact
+from typing import List, Optional, Literal, Union
+from .NomisStructure import StrictObject, Contact
 
 # ---
 # NOMIS API: Full dataset list
@@ -579,5 +578,5 @@ class Overview(StrictObject):
     mnemonic: str
 
 
-class SchemaDatasetOverview(StrictObject):
+class ResponseDatasetOverview(StrictObject):
     overview: Overview

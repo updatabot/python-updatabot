@@ -1,11 +1,11 @@
 from .fetch import fetch
-from .schema import SchemaConcept
+from .schema import ResponseConcept
 from pydantic import ValidationError
 from updatabot import logger
 import json
 
 
-def get_concept(conceptref: str) -> str:
+def fetch_concept(conceptref: str) -> str:
     """
     **DEPRECATED**: use conceptref.replace('_', ' ').title()
 
@@ -27,7 +27,7 @@ def get_concept(conceptref: str) -> str:
     # --
     obj = fetch(f'/concept/{conceptref}.def.sdmx.json')
     try:
-        parsed = SchemaConcept(**obj)
+        parsed = ResponseConcept(**obj)
     except ValidationError as e:
         logger.error(json.dumps(obj, indent=2))
         raise ValueError(f"Invalid concept response: {e}") from e

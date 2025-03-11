@@ -1,12 +1,9 @@
 from typing import Literal, List, Optional
-from .SchemaCommon import NomisStructure, StrictObject
-import json
+from .NomisStructure import NomisStructure, StrictObject
 
 # ---
-# NOMIS API: Get the name of a 'concept'
-#  /api/v01/concept/{conceptref}.def.sdmx.json
-#
-# This is a heavyweight wrapper around a single string!
+# NOMIS API: Get the codelist for a dimension
+#  /api/v01/codelist/{codelistref}.sdmx.json
 # ---
 
 ## fmt: off
@@ -113,5 +110,5 @@ class Structure(NomisStructure):
     codelists: Optional[Codelists] = None
 
 
-class SchemaCodelist(StrictObject):
+class ResponseCodelist(StrictObject):
     structure: Structure

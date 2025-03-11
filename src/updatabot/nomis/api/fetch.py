@@ -1,5 +1,5 @@
 import json
-from ..load_url import _ensure_cached
+from ...load_url import _ensure_cached
 from .base_url import BASE_URL
 
 

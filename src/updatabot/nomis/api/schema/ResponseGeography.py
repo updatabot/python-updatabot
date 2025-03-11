@@ -1,4 +1,4 @@
-from .SchemaCommon import NomisStructure, StrictObject
+from .NomisStructure import NomisStructure, StrictObject
 from typing import List, Optional
 
 ## fmt: off
@@ -101,5 +101,5 @@ class Structure(NomisStructure):
     codelists: Codelists
 
 
-class SchemaGeography(StrictObject):
+class ResponseGeography(StrictObject):
     structure: Structure

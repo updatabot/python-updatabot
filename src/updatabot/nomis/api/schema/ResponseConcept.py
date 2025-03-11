@@ -1,6 +1,5 @@
 from typing import Literal
-from .SchemaCommon import NomisStructure, StrictObject
-import json
+from .NomisStructure import NomisStructure, StrictObject
 
 # ---
 # NOMIS API: Get the name of a 'concept'
@@ -73,5 +72,5 @@ class Structure(NomisStructure):
     concepts: Concepts | None = None
 
 
-class SchemaConcept(StrictObject):
+class ResponseConcept(StrictObject):
     structure: Structure
