@@ -9,8 +9,8 @@ class StrictObject(BaseModel):
 class Contact(StrictObject):
     email: str
     name: str
-    telephone: str
-    uri: Optional[str] = ''
+    telephone: Optional[str] = None
+    uri: Optional[str] = None
 
 
 class Sender(StrictObject):

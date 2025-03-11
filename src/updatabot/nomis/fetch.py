@@ -1,5 +1,6 @@
 import json
 from ..load_url import _ensure_cached
+from .base_url import BASE_URL
 
 
 def fetch(url: str) -> dict:
@@ -13,7 +14,6 @@ def fetch(url: str) -> dict:
     Returns:
         The JSON object.
     """
-    BASE_URL = "https://www.nomisweb.co.uk/api/v01"
     local_path = _ensure_cached(BASE_URL + url)
     with open(local_path, 'r') as f:
         return json.load(f)
