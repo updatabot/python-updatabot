@@ -150,23 +150,42 @@ class NomisQuery:
         self._append_filter('geography', value)
         return self
 
+    def latest(self):
+        self._append_filter('date', 'latest')
+        return self
+
+    def since(self, value: str):
+        # TODO this is wrong.
+        self._append_filter('date', value)
+        return self
+
     def filter(self, key: str, name: str | None = None, value: str | int | None = None):
         if key == 'geography':
             raise ValueError("use .geography() instead")
-        if not name and not value:
-            raise ValueError("Must specify either name or value")
-        if name and value:
-            raise ValueError("Must specify either name or value, not both")
+        if key == 'time' or key == 'date':
+            raise ValueError("use .latest() or .since() instead")
+
         available = self.dimension(key).values
-        if name:
+        if name is not None:
+            if value is not None:
+                raise ValueError("Must specify either name or value, not both")
             match = next((x for x in available if x.name == name), None)
-            if not match:
+            if match is None:
+                logger.error(f"Name {name} not found in dimension {key}")
+                available_names = [x.name for x in available]
+                logger.error(f"Available values: {available_names}")
                 raise ValueError(f"Name {name} not found in dimension {key}")
-        if value:
+            self._append_filter(key, match.value)
+        elif value is not None:
             match = next((x for x in available if x.value == value), None)
-            if not match:
+            if match is None:
+                logger.error(f"Value {value} not found in dimension {key}")
+                available_values = [x.value for x in available]
+                logger.error(f"Available values: {available_values}")
                 raise ValueError(f"Value {value} not found in dimension {key}")
-        self._append_filter(key, match.value)
+            self._append_filter(key, match.value)
+        else:
+            raise ValueError("Must specify either name or value")
         return self
 
     def csv_url(self, limit=None) -> str:
@@ -183,6 +202,7 @@ class NomisQuery:
             else:
                 params[k] = str(v)
         if self.q_select:
+            # In the API, SELECT is case-insensitive.
             params['select'] = ','.join(self.q_select)
 
         # Append querystring if we have parameters
