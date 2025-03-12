@@ -6,6 +6,7 @@ from updatabot import logger
 import json
 from pydantic import ValidationError
 from .schema.ResponseCodelist import Codelist
+from .schema.ResponseDataset import Keyfamily
 
 BASE_URL = "https://www.nomisweb.co.uk/api/v01"
 
@@ -36,6 +37,22 @@ def fetch_search(q=None) -> schema.ResponseDataset:
 
     parsed = schema.ResponseDataset(**obj)
     return parsed
+
+
+def fetch_dataset(id: str) -> schema.ResponseDataset:
+    """A single-entry version of fetch_search, with the keyfamily extracted."""
+    obj = fetch(
+        f'/dataset/{id}.def.sdmx.json'
+    )
+
+    parsed = schema.ResponseDataset(**obj)
+    keyfamilies = parsed.structure.keyfamilies
+    if not keyfamilies:
+        raise ValueError(f"NOMIS dataset not found: {id}")
+    if len(keyfamilies.keyfamily) != 1:
+        raise ValueError(
+            f"Expected 1 keyfamily, got {len(keyfamilies.keyfamily)}")
+    return keyfamilies.keyfamily[0]
 
 
 def fetch_dataset_overview(id: str) -> schema.ResponseDatasetOverview:
