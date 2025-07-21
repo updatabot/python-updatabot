@@ -37,6 +37,7 @@ class NomisCode:
 
 class NomisQueryDimension:
     def __init__(self, dimension: Dimension):
+        self._original = dimension
         # Title, mostly matches key
         self.title = dimension.name
         # string; represents the "key" in the k/v querystring
@@ -224,5 +225,6 @@ def query(id: str) -> NomisQuery:
     """
     Open a dataset for querying.
     """
-    resp = api.fetch_dataset_overview(id)
-    return NomisQuery(resp.overview)
+    overview = api.fetch_dataset_overview(id).overview
+    # entry = api.fetch_search(q=id).response.results[0]
+    return NomisQuery(overview)

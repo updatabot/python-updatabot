@@ -113,11 +113,42 @@ def _load_as_excel(local_path: Path, sheet_name: str = '') -> pd.DataFrame:
     return pd.read_excel(local_path, sheet_name=sheet_name)
 
 
-def load_url(url: str, sheet_name: str = '', no_cache: bool = False) -> pd.DataFrame:
+def _load_local_path(local_path: Path, file_extension: str = '', sheet_name: str = '') -> pd.DataFrame:
+    if not file_extension:
+        file_extension = local_path.suffix
+    if file_extension not in ['.csv', '.xlsx', '.xls', '.json']:
+        raise ValueError(
+            f"Unsupported file extension: {file_extension}. Must be one of: .csv, .xlsx, .xls, .json. Pass file_extension='.csv' to force a particular parser.")
+
+    if file_extension == '.csv':
+        logger.debug(f"Loading as CSV: {local_path}")
+        return pd.read_csv(local_path)
+    elif file_extension in ('.xlsx', '.xls'):
+        logger.debug(f"Loading as Excel: {local_path}")
+        return _load_as_excel(local_path, sheet_name)
+    elif file_extension == '.json':
+        logger.debug(f"Loading as JSON: {local_path}")
+        return pd.read_json(local_path)
+    else:
+        raise ValueError('Unreachable')
+
+
+def load_url(url: str,
+             file_extension: str = '',
+             sheet_name: str = '',
+             no_cache: bool = False
+             ) -> pd.DataFrame:
     """Load data from a URL into a pandas DataFrame, with caching.
 
     Args:
         url (str): URL pointing to a CSV, Excel, or JSON file.
+
+        file_extension (str): Optional file extension to force, e.g. '.csv'.
+                              Useful for sketchy URLs like /download?file=...
+
+        sheet_name (str): Optional name of the XLS/XLSX sheet to load.
+                          If not provided, the sole sheet is loaded, or an error is raised.
+
         no_cache (bool): If True, redownload the file every time.
 
     Returns:
@@ -131,37 +162,4 @@ def load_url(url: str, sheet_name: str = '', no_cache: bool = False) -> pd.DataF
         f"Loading URL: {url} (sheet_name='{sheet_name}', no_cache={no_cache})")
 
     local_path = _ensure_cached(url, no_cache)
-
-    if local_path.suffix == '.csv':
-        logger.debug(f"Loading as CSV: {local_path}")
-        return pd.read_csv(local_path)
-    elif local_path.suffix in ('.xlsx', '.xls'):
-        logger.debug(f"Loading as Excel: {local_path}")
-        return _load_as_excel(local_path, sheet_name)
-    elif local_path.suffix == '.json':
-        logger.debug(f"Loading as JSON: {local_path}")
-        return pd.read_json(local_path)
-
-    # Try different formats if extension doesn't match content
-    logger.warning(
-        f"No recognized file extension for {url}, attempting to detect format")
-    try:
-        logger.debug("Attempting CSV format")
-        return pd.read_csv(local_path)
-    except Exception as e:
-        logger.debug(f"CSV parsing failed: {str(e)}")
-
-    try:
-        logger.debug("Attempting JSON format")
-        return pd.read_json(local_path)
-    except Exception as e:
-        logger.debug(f"JSON parsing failed: {str(e)}")
-
-    try:
-        logger.debug("Attempting Excel format")
-        return _load_as_excel(local_path, sheet_name)
-    except Exception as e:
-        logger.debug(f"Excel parsing failed: {str(e)}")
-
-    logger.error(f"Failed to parse {url} in any supported format")
-    raise ValueError(f"Could not parse {url} as CSV, XLSX or JSON data")
+    return _load_local_path(local_path, file_extension, sheet_name)
